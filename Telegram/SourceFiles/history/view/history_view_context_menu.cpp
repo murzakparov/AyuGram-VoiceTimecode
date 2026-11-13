@@ -1669,6 +1669,19 @@ void EditTagBox(
 	return result;
 }
 
+// Сколько миллисекунд отнимаем от текущей позиции голосового
+// при ответе с таймкодом: человек отвечает на то, что УЖЕ услышал.
+constexpr auto kVoiceTimecodeOffsetMs = crl::time(1500);
+
+[[nodiscard]] QString FormatVoiceTimecode(
+		const ::Media::Player::TrackState &state) {
+	const auto positionMs = int64(state.position) * 1000 / state.frequency;
+	const auto shifted = std::max<int64>(
+		positionMs - kVoiceTimecodeOffsetMs,
+		0);
+	return Ui::FormatDurationText(shifted / 1000);
+}
+
 } // namespace
 
 std::optional<QString> CurrentVoiceTimecode(FullMsgId itemId) {
@@ -1677,7 +1690,7 @@ std::optional<QString> CurrentVoiceTimecode(FullMsgId itemId) {
 	if (state.id.contextId() == itemId
 		&& !::Media::Player::IsStoppedOrStopping(state.state)
 		&& state.frequency > 0) {
-		return Ui::FormatDurationText(state.position / state.frequency);
+		return FormatVoiceTimecode(state);
 	}
 	return std::nullopt;
 }
@@ -1691,7 +1704,7 @@ rpl::producer<QString> VoiceTimecodeUpdates(FullMsgId itemId) {
 		return !::Media::Player::IsStoppedOrStopping(state.state)
 			&& state.frequency > 0;
 	}) | rpl::map([](const ::Media::Player::TrackState &state) {
-		return Ui::FormatDurationText(state.position / state.frequency);
+		return FormatVoiceTimecode(state);
 	}) | rpl::distinct_until_changed();
 }
 
