@@ -141,6 +141,38 @@ jobs:
           echo "Libraries are not finished yet. Progress is cached, run the workflow again."
           exit 1
 
+      - name: Free disk space on C.
+        shell: pwsh
+        run: |
+          Write-Host "Before cleanup:"
+          Get-PSDrive C,D | Format-Table Name,@{n='FreeGB';e={[math]::Round($_.Free/1GB,1)}}
+          $paths = @(
+            'C:\Android',
+            'C:\Program Files (x86)\Android',
+            'C:\Program Files\Android',
+            'C:\Julia',
+            'C:\Strawberry',
+            'C:\mingw64',
+            'C:\Program Files\Microsoft SQL Server',
+            'C:\Program Files\MongoDB',
+            'C:\Program Files\PostgreSQL',
+            'C:\Program Files\Azure Cosmos DB Emulator',
+            'C:\hostedtoolcache\windows\Java_Temurin-Hotspot_jdk',
+            'C:\hostedtoolcache\windows\Ruby',
+            'C:\hostedtoolcache\windows\go',
+            'C:\ProgramData\Microsoft\VisualStudio\Packages',
+            "$env:USERPROFILE\.rustup",
+            "$env:USERPROFILE\.cargo"
+          )
+          foreach ($p in $paths) {
+            if (Test-Path $p) {
+              Write-Host "Removing $p"
+              Remove-Item -Recurse -Force -ErrorAction SilentlyContinue $p
+            }
+          }
+          Write-Host "After cleanup:"
+          Get-PSDrive C,D | Format-Table Name,@{n='FreeGB';e={[math]::Round($_.Free/1GB,1)}}
+
       - name: AyuGram Desktop build.
         run: |
           cd %TBUILD%\%REPO_NAME%\Telegram
