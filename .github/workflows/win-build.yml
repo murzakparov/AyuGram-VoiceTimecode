@@ -151,8 +151,6 @@ jobs:
             'C:\Program Files (x86)\Android',
             'C:\Program Files\Android',
             'C:\Julia',
-            'C:\Strawberry',
-            'C:\mingw64',
             'C:\Program Files\Microsoft SQL Server',
             'C:\Program Files\MongoDB',
             'C:\Program Files\PostgreSQL',
@@ -160,7 +158,6 @@ jobs:
             'C:\hostedtoolcache\windows\Java_Temurin-Hotspot_jdk',
             'C:\hostedtoolcache\windows\Ruby',
             'C:\hostedtoolcache\windows\go',
-            'C:\ProgramData\Microsoft\VisualStudio\Packages',
             "$env:USERPROFILE\.rustup",
             "$env:USERPROFILE\.cargo"
           )
